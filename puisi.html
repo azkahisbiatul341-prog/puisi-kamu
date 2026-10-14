@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0e0a08">
+<title>Kumpulan Puisi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --hitam: #0e0a08;
+    --kulit: #4a2c1a;
+    --kulit-gelap: #2e1a0f;
+    --emas-pudar: #c9a574;
+    --kertas: #e9d6b4;
+    --kertas-tua: #d9c29a;
+    --tinta: #2a1b12;
+    --lebar: min(86vw, 360px);
+    --tinggi: min(74vh, 540px);
+    --durasi: .95s;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: "IM Fell English", Georgia, "Times New Roman", serif;
+    background: radial-gradient(ellipse at 50% 35%, #2b1a10 0%, var(--hitam) 70%);
+    color: var(--kertas);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 1.6rem; overflow: hidden;
+  }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  :focus-visible { outline: 2px solid var(--emas-pudar); outline-offset: 4px; }
+
+  /* ---------- BUKU ---------- */
+  .buku {
+    position: relative;
+    width: var(--lebar); height: var(--tinggi);
+    perspective: 2000px;
+    filter: drop-shadow(0 24px 34px rgba(0,0,0,.7));
+    cursor: pointer;
+  }
+  .lembar {
+    position: absolute; inset: 0;
+    transform-origin: left center;
+    transform-style: preserve-3d;
+    transition: transform var(--durasi) cubic-bezier(.5,.05,.25,1), visibility 0s linear 0s;
+  }
+  .lembar.terbuka {
+    transform: rotateY(-180deg);
+    visibility: hidden;
+    transition: transform var(--durasi) cubic-bezier(.5,.05,.25,1), visibility 0s linear var(--durasi);
+  }
+  .sisi {
+    position: absolute; inset: 0;
+    backface-visibility: hidden; -webkit-backface-visibility: hidden;
+    border-radius: 3px 8px 8px 3px;
+    overflow: hidden;
+  }
+  .belakang { transform: rotateY(180deg); }
+
+  /* ---------- SAMPUL ---------- */
+  .sampul {
+    background:
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"),
+      linear-gradient(135deg, #5b3622 0%, var(--kulit) 45%, var(--kulit-gelap) 100%);
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,.5), inset 0 0 60px rgba(0,0,0,.45);
+    display: flex; align-items: center; justify-content: center;
+  }
+  /* punggung buku */
+  .sampul::before {
+    content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 34px;
+    background:
+      repeating-linear-gradient(to bottom, transparent 0 22%, rgba(201,165,116,.35) 22% 22.6%, transparent 22.6% 78%, rgba(201,165,116,.35) 78% 78.6%, transparent 78.6%),
+      linear-gradient(to right, rgba(0,0,0,.65), rgba(0,0,0,.1) 70%, rgba(255,255,255,.06));
+  }
+  .bingkai {
+    position: absolute; top: 22px; bottom: 22px; left: 52px; right: 22px;
+    border: 1px solid var(--emas-pudar);
+    outline: 1px solid rgba(201,165,116,.5); outline-offset: 5px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 1.1rem; text-align: center; padding: 1rem;
+    color: var(--emas-pudar);
+    text-shadow: 0 -1px 0 rgba(0,0,0,.7), 0 1px 0 rgba(255,225,170,.15);
+  }
+  .bingkai h1 { font-weight: 400; font-size: clamp(1.9rem, 8vw, 2.5rem); line-height: 1.15; }
+  .garis { width: 46%; height: 1px; background: var(--emas-pudar); opacity: .7; position: relative; }
+  .garis::after {
+    content: ""; position: absolute; left: 50%; top: 50%; width: 7px; height: 7px;
+    background: var(--kulit); border: 1px solid var(--emas-pudar);
+    transform: translate(-50%,-50%) rotate(45deg);
+  }
+  .petunjuk { font-style: italic; font-size: 1rem; opacity: .8; }
+
+  /* bagian dalam sampul (terlihat saat dibuka) */
+  .dalam-sampul {
+    background: linear-gradient(135deg, #3a2113, var(--kulit-gelap));
+    box-shadow: inset 0 0 50px rgba(0,0,0,.6);
+  }
+
+  /* ---------- HALAMAN ---------- */
+  .halaman {
+    background:
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .35  0 0 0 0 .22  0 0 0 0 .1  0 0 0 .22 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"),
+      linear-gradient(to right, rgba(60,35,15,.38) 0, rgba(60,35,15,0) 11%),
+      radial-gradient(ellipse at 55% 45%, var(--kertas) 0%, var(--kertas-tua) 100%);
+    color: var(--tinta);
+    box-shadow: inset 0 0 40px rgba(90,55,25,.35);
+  }
+  .halaman .isi-puisi {
+    position: absolute; inset: 0;
+    padding: 2.4rem 1.7rem 3rem 2.6rem;
+    display: flex; flex-direction: column; justify-content: center;
+    overflow-y: auto;
+  }
+  .halaman h2 {
+    font-weight: 400; font-size: clamp(2rem, 8.5vw, 2.6rem); line-height: 1.1;
+    margin-bottom: 1.1rem;
+  }
+  .halaman .garis-tinta { width: 2.6rem; height: 1px; background: var(--tinta); opacity: .55; margin-bottom: 1.2rem; }
+  .halaman p {
+    font-style: italic; font-size: clamp(1.05rem, 4.3vw, 1.22rem);
+    line-height: 1.8; text-wrap: pretty;
+  }
+  .nomor {
+    position: absolute; bottom: 1rem; left: 0; right: 0; text-align: center;
+    font-size: .95rem; opacity: .6;
+  }
+
+  /* ---------- TOMBOL ---------- */
+  .navigasi { display: flex; align-items: center; gap: 1.4rem; min-height: 46px; }
+  .navigasi button {
+    width: 46px; height: 46px; border-radius: 50%;
+    background: var(--kulit-gelap); border: 1px solid rgba(201,165,116,.45);
+    color: var(--emas-pudar); font-size: 1.5rem; line-height: 1;
+    display: flex; align-items: center; justify-content: center; padding-bottom: 3px;
+    transition: opacity .2s ease, background .2s ease;
+  }
+  .navigasi button:hover:not(:disabled) { background: #3c2314; }
+  .navigasi button:disabled { opacity: .25; cursor: default; }
+
+  /* ---------- LAGU ---------- */
+  .lagu {
+    position: fixed; right: 1rem; bottom: 1rem; z-index: 20;
+    display: none; align-items: center; gap: .55rem;
+    background: rgba(46,26,15,.92); border: 1px solid rgba(201,165,116,.45);
+    border-radius: 999px; padding: .5rem 1.05rem .5rem .85rem;
+    color: var(--emas-pudar); font-size: 1rem;
+  }
+  .lagu.tampil { display: flex; }
+  .lagu .not { display: inline-block; font-size: 1.15rem; }
+  .lagu.main .not { animation: goyang 2.4s ease-in-out infinite; }
+  @keyframes goyang { 50% { transform: translateY(-3px) rotate(-10deg); } }
+
+  /* Player YouTube disembunyikan, tapi tetap ada di halaman */
+  #yt { position: fixed; left: -9999px; top: 0; width: 200px; height: 200px; pointer-events: none; opacity: 0; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lembar, .lembar.terbuka { transition: none; }
+    .lagu.main .not { animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="buku" id="buku" aria-label="Buku puisi">
+
+  <!-- Lembar 1: sampul -->
+  <div class="lembar" data-ke="0">
+    <div class="sisi sampul">
+      <div class="bingkai">
+        <h1>Kumpulan Puisi</h1>
+        <div class="garis"></div>
+        <p class="petunjuk">Ketuk untuk membuka</p>
+      </div>
+    </div>
+    <div class="sisi belakang dalam-sampul"></div>
+  </div>
+
+  <!-- Lembar 2: puisi pertama -->
+  <div class="lembar" data-ke="1">
+    <div class="sisi halaman">
+      <div class="isi-puisi">
+        <h2>Cakrawala</h2>
+        <div class="garis-tinta"></div>
+        <p>Di bawah sang Cakrawala, sorot matamu lah satu-satunya yang bisa mengalahkannya, tidak menghunus hanya saja menyentuh, seolah membelai setiap ragu, membasuh banyak pilu</p>
+      </div>
+      <div class="nomor">1</div>
+    </div>
+    <div class="sisi belakang halaman"></div>
+  </div>
+
+  <!-- Lembar 3: puisi kedua -->
+  <div class="lembar" data-ke="2">
+    <div class="sisi halaman">
+      <div class="isi-puisi">
+        <h2>Kuning</h2>
+        <div class="garis-tinta"></div>
+        <p>Diantara makhluk yang tuhan ciptakan, aku selalu jatuh cinta pada dirimu, bukan tentang siapa yang paling sempurna dimata semua, namun diantara siapapun yang mampu kucari sorot matanya diantara keramaian, yang suaranya mampu buat aliran darahku berdesir</p>
+      </div>
+      <div class="nomor">2</div>
+    </div>
+    <div class="sisi belakang halaman"></div>
+  </div>
+
+</div>
+
+<nav class="navigasi" aria-label="Navigasi halaman">
+  <button id="mundur" type="button" aria-label="Halaman sebelumnya" disabled>&#8249;</button>
+  <button id="maju" type="button" aria-label="Halaman berikutnya">&#8250;</button>
+</nav>
+
+<button class="lagu" id="lagu" type="button" aria-label="Jeda atau putar lagu">
+  <span class="not" aria-hidden="true">&#9834;</span><span id="labelLagu">Jeda lagu</span>
+</button>
+
+<div id="yt"><div id="player"></div></div>
+
+<script>
+  const buku = document.getElementById("buku");
+  const lembar = Array.from(document.querySelectorAll(".lembar"));
+  const maju = document.getElementById("maju");
+  const mundur = document.getElementById("mundur");
+  const total = lembar.length;
+  const maks = total - 1;      // lembar terakhir tetap terlihat
+  let posisi = 0;              // jumlah lembar yang sudah dibalik
+
+  lembar.forEach(function (el, i) { el.style.zIndex = total - i; });
+
+  function tampilkan() {
+    lembar.forEach(function (el, i) {
+      el.classList.toggle("terbuka", i < posisi);
+    });
+    mundur.disabled = posisi === 0;
+    maju.disabled = posisi === maks;
+  }
+
+  function berikutnya() {
+    if (posisi === 0) mulaiLagu();   // dipanggil dari ketukan, jadi diizinkan browser
+    if (posisi < maks) { posisi++; tampilkan(); }
+  }
+  function sebelumnya() { if (posisi > 0) { posisi--; tampilkan(); } }
+
+  maju.addEventListener("click", berikutnya);
+  mundur.addEventListener("click", sebelumnya);
+
+  // Ketuk buku: sisi kiri = mundur, sisi kanan = maju (sampul selalu membuka)
+  buku.addEventListener("click", function (e) {
+    if (posisi === 0) { berikutnya(); return; }
+    const kotak = buku.getBoundingClientRect();
+    if (e.clientX - kotak.left < kotak.width * 0.3) sebelumnya(); else berikutnya();
+  });
+
+  // Geser jari
+  let awalX = null;
+  buku.addEventListener("touchstart", function (e) { awalX = e.touches[0].clientX; }, { passive: true });
+  buku.addEventListener("touchend", function (e) {
+    if (awalX === null) return;
+    const selisih = e.changedTouches[0].clientX - awalX;
+    if (Math.abs(selisih) > 45) {
+      e.preventDefault();
+      if (selisih < 0) berikutnya(); else sebelumnya();
+    }
+    awalX = null;
+  });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "ArrowRight") berikutnya();
+    if (e.key === "ArrowLeft") sebelumnya();
+  });
+
+  // ====== LAGU (YouTube) — ganti VIDEO_ID kalau mau lagu lain ======
+  const VIDEO_ID = "-hxmeNCmAwg";
+  // ==================================================================
+  const tombolLagu = document.getElementById("lagu");
+  const labelLagu = document.getElementById("labelLagu");
+  let player = null;
+  let siap = false;
+  let sudahMulai = false;
+  let sedangMain = false;
+
+  const tag = document.createElement("script");
+  tag.src = "https://www.youtube.com/iframe_api";
+  document.head.appendChild(tag);
+
+  window.onYouTubeIframeAPIReady = function () {
+    player = new YT.Player("player", {
+      width: "200",
+      height: "200",
+      videoId: VIDEO_ID,
+      playerVars: {
+        autoplay: 0, controls: 0, loop: 1, playlist: VIDEO_ID,
+        playsinline: 1, rel: 0, modestbranding: 1
+      },
+      events: {
+        onReady: function () {
+          siap = true;
+          if (sudahMulai) player.playVideo();
+        },
+        onStateChange: function (e) {
+          sedangMain = (e.data === YT.PlayerState.PLAYING);
+          perbaruiLagu();
+        },
+        onError: function () {
+          labelLagu.textContent = "Lagu tidak bisa diputar";
+          tombolLagu.classList.remove("main");
+        }
+      }
+    });
+  };
+
+  function perbaruiLagu() {
+    labelLagu.textContent = sedangMain ? "Jeda lagu" : "Putar lagu";
+    tombolLagu.classList.toggle("main", sedangMain);
+  }
+
+  function mulaiLagu() {
+    if (sudahMulai) return;
+    sudahMulai = true;
+    tombolLagu.classList.add("tampil");
+    if (siap) {
+      player.unMute();
+      player.setVolume(100);
+      player.playVideo();
+    }
+  }
+
+  tombolLagu.addEventListener("click", function () {
+    if (!siap) return;
+    if (sedangMain) player.pauseVideo(); else player.playVideo();
+  });
+
+  tampilkan();
+</script>
+</body>
+</html>
